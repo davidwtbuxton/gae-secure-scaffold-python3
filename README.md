@@ -76,7 +76,7 @@ You can customise your application by creating a Python file. Then set the envir
 And add the environment variable to `app.yaml`:
 
     # app.yaml
-    runtime: python37
+    runtime: python312
 
     handlers:
       - url: /.*
@@ -86,6 +86,19 @@ And add the environment variable to `app.yaml`:
       FLASK_SETTINGS_FILENAME: "settings.py"
 
 See [Configuration Handling](https://flask.palletsprojects.com/en/master/config/) in the Flask documentation for more details.
+
+
+### Configure Flask's SECRET_KEY
+
+Some apps will need to configure a SECRET_KEY for Flask. Your app should fetch this value from a secrets store such as [Cloud Secret Manager](https://cloud.google.com/security/products/secret-manager).
+
+For compatibility with older versions of securescaffold, use the AppConfig class to store a secret key in Cloud Datastore. Add "google-cloud-ndb" to the project's requirements.txt, then update the app creation like so:
+
+    import securescaffold
+    from securescaffold.datastoreconfig import configure_secret_key
+
+    app = securescaffold.create_app(__name__)
+    configure_secret_key(app)
 
 
 ### Changing the CSP configuration

@@ -23,5 +23,6 @@ nox.options.default_venv_backend = "venv"
 def tests(session, flask):
     session.install("pytest")
     session.install(f"flask~={flask}.0")
+    session.install("google-cloud-ndb")
     session.install(".")
     session.run("pytest", "--disable-warnings")

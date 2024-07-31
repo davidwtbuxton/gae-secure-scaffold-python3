@@ -12,45 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-import os
-import secrets
-from typing import Optional
 
 import flask
 import flask_seasurf
 import flask_talisman
-from google.cloud import ndb
-
-
-class AppConfig(ndb.Model):
-    """Datastore model for storing app-wide configuration.
-
-    This is used by `create_app` to save a random value for SECRET_KEY that
-    persists across application startup, rather than defining SECRET_KEY in
-    your source code.
-    """
-
-    SINGLETON_ID = "config"
-
-    secret_key = ndb.StringProperty()
-
-    @classmethod
-    def singleton(cls) -> "AppConfig":
-        """Create a datastore entity to store app-wide configuration."""
-        config = cls.initial_config()
-        obj = cls.get_or_insert(cls.SINGLETON_ID, **config)
-
-        return obj
-
-    @classmethod
-    def initial_config(cls) -> dict:
-        """Initial values for app configuration."""
-        config = {
-            "secret_key": secrets.token_urlsafe(16),
-        }
-
-        return config
 
 
 def create_app(*args, **kwargs) -> flask.Flask:
@@ -86,20 +51,6 @@ def configure_app(app: flask.Flask) -> None:
     """
     app.config.from_object("securescaffold.settings")
     app.config.from_envvar("FLASK_SETTINGS_FILENAME", silent=True)
-
-    if not app.config["SECRET_KEY"]:
-        config = get_config_from_datastore()
-        app.config["SECRET_KEY"] = config.secret_key
-
-
-def get_config_from_datastore() -> AppConfig:
-    # This happens at application startup, so we use a new NDB context.
-    client = ndb.Client()
-
-    with client.context():
-        obj = AppConfig.singleton()
-
-    return obj
 
 
 def get_talisman_config(config: dict) -> dict:

@@ -18,7 +18,6 @@ import traceback
 import flask
 import google.auth
 import google.auth.transport.requests
-import requests
 import securescaffold
 from google.auth.compute_engine import credentials
 from google.cloud import storage
